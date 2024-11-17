@@ -76,7 +76,7 @@ def process_tracking(frame, detector, tracker, args, frame_id, fps):
         numpy.ndarray: The processed tracking image.
     """
     # Face detection and tracking
-    outputs, img_info, bboxes, landmarks = detector.detect_tracking(image=frame)
+    outputs, img_info, bboxes, landmarks = detector.detect_tracking(image=frame,input_size=(256,256))
 
     tracking_tlwhs = []
     tracking_ids = []
@@ -85,7 +85,7 @@ def process_tracking(frame, detector, tracker, args, frame_id, fps):
 
     if outputs is not None:
         online_targets = tracker.update(
-            outputs, [img_info["height"], img_info["width"]], (128, 128)
+            outputs, [img_info["height"], img_info["width"]], (256,256)
         )
 
         for i in range(len(online_targets)):
@@ -225,7 +225,7 @@ def tracking(detector, args):
     tracker = BYTETracker(args=args, frame_rate=30)
     frame_id = 0
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture("C:\\Users\\MK\\Desktop\\test2.mp4")
 
     while True:
         _, img = cap.read()
