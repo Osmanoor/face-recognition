@@ -235,10 +235,10 @@ class FaceTrackerRecognizer:
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
 
-if __name__ == "__main__":
-    face_tracker_recognizer = FaceTrackerRecognizer(camera_ip="http://192.168.1.143:8080/video")
-    face_tracker_recognizer.start()
+# if __name__ == "__main__":
+#     face_tracker_recognizer = FaceTrackerRecognizer(camera_ip="http://192.168.1.143:8080/video")
+#     face_tracker_recognizer.start()
 
-    time.sleep(10)
-    face_tracker_recognizer.stop()
+#     time.sleep(10)
+#     face_tracker_recognizer.stop()
     

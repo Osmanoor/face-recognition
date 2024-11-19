@@ -1,15 +1,15 @@
 import sys
 import os
 from flask import request, jsonify, Response, send_from_directory
-from app.services.student_management import StudentManagement
+# from app.services.student_management import StudentManagement
 # from app.services.face_recognition import FaceTrackerRecognizer
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
-from recognize import FaceTrackerRecognizer
+# from recognize import FaceTrackerRecognizer
 
 
-student_db_path = 'Students.csv'
-student_management = StudentManagement(student_db_path)
-face_tracker = FaceTrackerRecognizer(0)
+# student_db_path = 'Students.csv'
+# student_management = StudentManagement(student_db_path)
+# face_tracker = FaceTrackerRecognizer(0)
 
 def register_routes(app):
     @app.route("/")
