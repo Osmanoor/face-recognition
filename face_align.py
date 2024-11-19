@@ -4,7 +4,7 @@ import cv2
 
 from face_alignment.alignment import norm_crop
 from face_detection.scrfd.detector import SCRFD
-from face_detection.yolov5_face.detector import Yolov5Face
+# from face_detection.yolov5_face.detector import Yolov5Face
 
 # Initialize the face detector
 # detector = Yolov5Face(model_file="face_detection/yolov5_face/weights/yolov5n-0.5.pt")

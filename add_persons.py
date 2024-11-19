@@ -8,7 +8,7 @@ import torch
 from torchvision import transforms
 
 from face_detection.scrfd.detector import SCRFD
-from face_detection.yolov5_face.detector import Yolov5Face
+# from face_detection.yolov5_face.detector import Yolov5Face
 from face_recognition.arcface.model import iresnet_inference
 from face_recognition.arcface.utils import read_features
 
@@ -88,6 +88,14 @@ def add_persons(backup_dir, add_persons_dir, faces_save_dir, features_path):
                 # Detect faces and landmarks using the face detector
                 bboxes, landmarks = detector.detect(image=input_image)
 
+                # Check if no faces are detected
+                if len(bboxes) == 0:
+                    return f"Error: No face detected in image {image_name} for student {name_person}."
+
+                # Check if more than one face is detected
+                if len(bboxes) > 1:
+                    return f"Error: More than one face detected in image {image_name} for student {name_person}."
+
                 # Extract faces
                 for i in range(len(bboxes)):
                     # Get the number of files in the person's path
@@ -111,8 +119,7 @@ def add_persons(backup_dir, add_persons_dir, faces_save_dir, features_path):
 
     # Check if no new person is found
     if images_emb == [] and images_name == []:
-        print("No new person found!")
-        return None
+        return "No new student found!"
 
     # Convert lists to arrays
     images_emb = np.array(images_emb)
@@ -139,10 +146,64 @@ def add_persons(backup_dir, add_persons_dir, faces_save_dir, features_path):
         dir_to_move = os.path.join(add_persons_dir, sub_dir)
         shutil.move(dir_to_move, backup_dir, copy_function=shutil.copytree)
 
-    print("Successfully added new person!")
+    return "Successfully added new student!"
 
+def delete_person(person_id, features_path, faces_save_dir, backup_dir):
+    """
+    Delete a person from the face recognition database.
 
-if __name__ == "__main__":
+    Args:
+        person_id (str): The ID (name) of the person to be deleted.
+        features_path (str): Path to the face features file (features.npz).
+        faces_save_dir (str): Directory where faces are saved.
+        backup_dir (str): Directory where backup data is stored.
+
+    Returns:
+        str: Success or error message.
+    """
+    try:
+        # Read existing features
+        features = read_features(features_path)
+        if features is None:
+            return "Error: No features found in the database."
+
+        # Unpack existing features
+        images_name, images_emb = features
+
+        # Check if the person exists in the database
+        if person_id not in images_name:
+            return f"Error: Person with ID '{person_id}' not found in the database."
+
+        # Filter out the features and names of the person to be deleted
+        indices_to_keep = images_name != person_id
+        updated_images_name = images_name[indices_to_keep]
+        updated_images_emb = images_emb[indices_to_keep]
+
+        # Save the updated features
+        np.savez_compressed(features_path, images_name=updated_images_name, images_emb=updated_images_emb)
+        print("Updated features!")
+
+        # Remove the person's directory from the faces_save_dir
+        person_face_path = os.path.join(faces_save_dir, person_id)
+        if os.path.exists(person_face_path):
+            shutil.rmtree(person_face_path)
+            print(f"Removed person's faces from {person_face_path}")
+
+        # Remove the person's directory from the backup_dir
+        person_backup_path = os.path.join(backup_dir, person_id)
+        if os.path.exists(person_backup_path):
+            shutil.rmtree(person_backup_path)
+            print(f"Removed person's backup from {person_backup_path}")
+
+        return "Successfully deleted person!"
+
+    except Exception as e:
+        return f"Error: An unexpected error occurred - {str(e)}"
+
+def delete(ID):
+    return delete_person(person_id=ID, features_path="./datasets/face_features/feature", faces_save_dir="./datasets/data/", backup_dir="./datasets/backup")
+
+def add():
     # Parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -172,4 +233,7 @@ if __name__ == "__main__":
     opt = parser.parse_args()
 
     # Run the main function
-    add_persons(**vars(opt))
+    return add_persons(**vars(opt))
+
+if __name__ == "__main__":
+    add()
